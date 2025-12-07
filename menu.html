@@ -131,9 +131,23 @@ function incrementCard(card) {
 }
 
 allCards.forEach(card => {
-  card.addEventListener('click', () => incrementCard(card));
-  card.addEventListener('dblclick', () => incrementCard(card));
+  card.addEventListener('click', () => {
+    incrementCard(card);
+  });
+
+  card.addEventListener('dblclick', () => {
+    const counterEl = card.querySelector('.counter');
+    let count = Number(counterEl.dataset.count);
+
+    if (count > 0) {
+      count -= 1;
+      counterEl.dataset.count = String(count);
+      counterEl.textContent = String(count);
+      updateTotals();
+    }
+  });
 });
+
 
 // Pickup times
 const pickupSelect = document.getElementById('pickupTime');
@@ -192,6 +206,7 @@ buyBtn.addEventListener('click', () => {
 
 </body>
 </html>
+
 
 
 
