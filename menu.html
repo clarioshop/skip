@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>Skip - Menu</title>
 <style>
   :root { --bg:#000; --panel:#111; --gold:#FFD700; --gold-soft:#ffea00; --grid-min:220px; }
@@ -103,6 +103,7 @@ const name = localStorage.getItem('skip_name') || 'Guest';
 const email = localStorage.getItem('skip_email') || '';
 document.getElementById('welcome').textContent = `Welcome, ${name}!`;
 
+// Counters
 let total = 0;
 const cartCountEl = document.getElementById('cartCount');
 const totalEl = document.getElementById('totalPrice');
@@ -121,54 +122,63 @@ function updateTotals() {
   totalEl.textContent = sum;
 }
 
-function incrementCard(card) {
+function incrementCard(card, remove=false) {
   const counterEl = card.querySelector('.counter');
-  const count = Number(counterEl.dataset.count) + 1;
+  let count = Number(counterEl.dataset.count);
+  if(remove) count = Math.max(0, count-1);
+  else count += 1;
   counterEl.dataset.count = String(count);
   counterEl.textContent = String(count);
   updateTotals();
 }
 
 allCards.forEach(card => {
-  // Single click = ADD
-  card.addEventListener('click', () => {
-    incrementCard(card);
-  });
-
-  // Double click = REMOVE
-  card.addEventListener('dblclick', () => {
-    const counterEl = card.querySelector('.counter');
-    let count = Number(counterEl.dataset.count);
-
-    if (count > 0) {
-      count -= 1;
-      counterEl.dataset.count = String(count);
-      counterEl.textContent = String(count);
-      updateTotals();
-    }
+  card.addEventListener('click', (e) => {
+    if(e.detail===1) incrementCard(card);        // single click adds
+    else if(e.detail===2) incrementCard(card,true); // double click removes
   });
 });
 
-// Pickup times
+// Populate pickup times
 const pickupSelect = document.getElementById('pickupTime');
 function pad(n){ return n.toString().padStart(2,'0'); }
-for (let h=8; h<=15; h++) {
-  for (let m of [0,30]) {
-    const v = `${pad(h)}:${pad(m)}`;
-    const opt = document.createElement('option');
-    opt.value = v; opt.textContent = v;
-    pickupSelect.appendChild(opt);
+let times = [];
+for(let h=8; h<=15; h++){
+  for(let m of [0,30]){
+    times.push(`${pad(h)}:${pad(m)}`);
   }
 }
 
+// Fetch live counts from Google Sheet
+const COUNT_URL = 'YOUR_WEB_APP_COUNT_URL'; // Replace with your Apps Script JSON endpoint
+
+async function populatePickupTimes(){
+  let counts = {};
+  try {
+    const res = await fetch(COUNT_URL);
+    counts = await res.json(); // e.g., {"08:00":1,"11:30":2}
+  } catch(err){ console.error(err); }
+
+  pickupSelect.innerHTML = '';
+  times.forEach(time=>{
+    const count = counts[time]||0;
+    const opt = document.createElement('option');
+    opt.value = time;
+    opt.textContent = `${time} (${count} orders)`;
+    pickupSelect.appendChild(opt);
+  });
+}
+
+populatePickupTimes();
+
 // Google Form submission
 const buyBtn = document.getElementById('buyBtn');
-buyBtn.addEventListener('click', () => {
+buyBtn.addEventListener('click', async () => {
   const parts = [];
   allCards.forEach(card => {
     const itemName = card.dataset.name;
     const count = Number(card.querySelector('.counter').dataset.count);
-    if (count>0) parts.push(`${itemName} x${count}`);
+    if(count>0) parts.push(`${itemName} x${count}`);
   });
   if(parts.length === 0){ alert('Add at least one item'); return; }
 
@@ -177,17 +187,15 @@ buyBtn.addEventListener('click', () => {
   const pickupTime = pickupSelect.value;
 
   const formData = new FormData();
-  formData.append('entry.1552952187', name);      // Name
-  formData.append('entry.332170824', email);      // Email
-  formData.append('entry.12849461', orderStr);    // Order
-  formData.append('entry.1633261989', totalStr);  // Total
-  formData.append('entry.410263436', pickupTime); // Pickup time
+  formData.append('entry.1552952187', name);
+  formData.append('entry.332170824', email);
+  formData.append('entry.12849461', orderStr);
+  formData.append('entry.1633261989', totalStr);
+  formData.append('entry.410263436', pickupTime);
 
   fetch('https://docs.google.com/forms/d/e/1FAIpQLSeplyNN9dAlA2Q16g9mI8wICdst3PdlY_X2u2PXGrtTne3khw/formResponse', {
-    method: 'POST',
-    body: formData,
-    mode: 'no-cors'
-  }).then(() => {
+    method:'POST', body:formData, mode:'no-cors'
+  }).then(()=>{
     alert('Order submitted! Thank you.');
     allCards.forEach(card=>{
       const counterEl = card.querySelector('.counter');
@@ -195,6 +203,7 @@ buyBtn.addEventListener('click', () => {
       counterEl.textContent='0';
     });
     updateTotals();
+    populatePickupTimes(); // refresh live counts
   }).catch(err=>{
     console.error(err);
     alert('Failed to submit order. Please try again.');
