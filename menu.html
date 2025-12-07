@@ -5,28 +5,28 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Skip - Menu</title>
 <style>
-:root { --bg:#000; --panel:#111; --gold:#FFD700; --gold-soft:#ffea00; --grid-min:220px; }
-body { margin:0; background:var(--bg); color:var(--gold); font-family:'Segoe UI', system-ui, -apple-system, sans-serif; }
-header { display:flex; align-items:center; justify-content:space-between; gap:.75rem; padding:1rem 1.25rem; border-bottom:2px solid var(--gold); }
-.welcome { font-weight:700; }
-.cart { position:relative; background:var(--gold); color:#000; border-radius:999px; padding:.5rem .9rem; font-weight:800; box-shadow:0 0 10px var(--gold); }
-.container { max-width:1000px; margin:0 auto; padding:1.25rem; }
-.section-title { margin-top:1rem; font-size:1.4rem; font-weight:800; border-left:4px solid var(--gold); padding-left:.5rem; }
-.grid { display:grid; grid-template-columns:repeat(auto-fill, minmax(var(--grid-min), 1fr)); gap:1.25rem; margin-top:1rem; }
-.card { background:var(--panel); border:1px solid var(--gold); border-radius:14px; padding:1rem; position:relative; transition:transform .25s ease, box-shadow .25s ease; cursor:pointer; }
-.card:hover { transform:translateY(-4px); box-shadow:0 0 14px var(--gold); }
-.image-box { width:100%; aspect-ratio:1/1; background:#222; border-radius:10px; overflow:hidden; display:flex; align-items:center; justify-content:center; margin-bottom:.8rem; }
-.image-box img { width:100%; height:100%; object-fit:cover; }
-.title { font-weight:700; margin:.25rem 0; }
-.price { opacity:.95; }
-.counter { position:absolute; top:.75rem; right:.75rem; width:34px; height:34px; border-radius:50%; background:var(--gold); color:#000; display:flex; align-items:center; justify-content:center; font-weight:900; box-shadow:0 0 8px var(--gold); }
-.summary { margin-top:1.25rem; display:grid; grid-template-columns:1fr; gap:.75rem; align-items:center; }
-.row { display:flex; align-items:center; justify-content:space-between; gap:1rem; flex-wrap:wrap; }
-select { appearance:none; background:#0e0e0e; color:var(--gold); border:1px solid var(--gold); border-radius:8px; padding:.6rem .9rem; min-width:160px; }
-.total { font-weight:800; font-size:1.2rem; }
-.buy { width:100%; background:var(--gold); color:#000; border:none; border-radius:10px; padding:.9rem 1rem; font-weight:900; cursor:pointer; transition:transform .2s ease, background .25s ease; }
-.buy:hover { transform:scale(1.02); background:var(--gold-soft); }
-.birr { font-weight:700; }
+  :root { --bg:#000; --panel:#111; --gold:#FFD700; --gold-soft:#ffea00; --grid-min:220px; }
+  body { margin:0; background:var(--bg); color:var(--gold); font-family:'Segoe UI', system-ui, -apple-system, sans-serif; }
+  header { display:flex; align-items:center; justify-content:space-between; gap:.75rem; padding:1rem 1.25rem; border-bottom:2px solid var(--gold); }
+  .welcome { font-weight:700; }
+  .cart { position:relative; background:var(--gold); color:#000; border-radius:999px; padding:.5rem .9rem; font-weight:800; box-shadow:0 0 10px var(--gold); }
+  .container { max-width:1000px; margin:0 auto; padding:1.25rem; }
+  .section-title { margin-top:1rem; font-size:1.4rem; font-weight:800; border-left:4px solid var(--gold); padding-left:.5rem; }
+  .grid { display:grid; grid-template-columns:repeat(auto-fill, minmax(var(--grid-min), 1fr)); gap:1.25rem; margin-top:1rem; }
+  .card { background:var(--panel); border:1px solid var(--gold); border-radius:14px; padding:1rem; position:relative; transition:transform .25s ease, box-shadow .25s ease; cursor:pointer; }
+  .card:hover { transform:translateY(-4px); box-shadow:0 0 14px var(--gold); }
+  .image-box { width:100%; aspect-ratio:1/1; background:#222; border-radius:10px; overflow:hidden; display:flex; align-items:center; justify-content:center; margin-bottom:.8rem; }
+  .image-box img { width:100%; height:100%; object-fit:cover; }
+  .title { font-weight:700; margin:.25rem 0; }
+  .price { opacity:.95; }
+  .counter { position:absolute; top:.75rem; right:.75rem; width:34px; height:34px; border-radius:50%; background:var(--gold); color:#000; display:flex; align-items:center; justify-content:center; font-weight:900; box-shadow:0 0 8px var(--gold); }
+  .summary { margin-top:1.25rem; display:grid; grid-template-columns:1fr; gap:.75rem; align-items:center; }
+  .row { display:flex; align-items:center; justify-content:space-between; gap:1rem; flex-wrap:wrap; }
+  select { appearance:none; background:#0e0e0e; color:var(--gold); border:1px solid var(--gold); border-radius:8px; padding:.6rem .9rem; min-width:160px; }
+  .total { font-weight:800; font-size:1.2rem; }
+  .buy { width:100%; background:var(--gold); color:#000; border:none; border-radius:10px; padding:.9rem 1rem; font-weight:900; cursor:pointer; transition:transform .2s ease, background .25s ease; }
+  .buy:hover { transform:scale(1.02); background:var(--gold-soft); }
+  .birr { font-weight:700; }
 </style>
 </head>
 <body>
@@ -122,13 +122,14 @@ function updateTotals() {
   totalEl.textContent = sum;
 }
 
-function incrementCard(card, event) {
+// Toggle add/remove on click
+function toggleCard(card) {
   const counterEl = card.querySelector('.counter');
   let count = Number(counterEl.dataset.count);
-  if(event.detail === 1){ // single click: increment
-    count++;
-  } else if(event.detail === 2){ // double click: decrement
-    count = Math.max(0, count - 1);
+  if(count === 0) {
+    count = 1; // add
+  } else {
+    count = 0; // remove
   }
   counterEl.dataset.count = String(count);
   counterEl.textContent = String(count);
@@ -136,51 +137,55 @@ function incrementCard(card, event) {
 }
 
 allCards.forEach(card => {
-  card.addEventListener('click', e => incrementCard(card, e));
+  card.addEventListener('click', () => toggleCard(card));
 });
 
 // Pickup times with live counts
 const pickupSelect = document.getElementById('pickupTime');
-const times = [];
+const COUNT_URL = 'https://script.google.com/macros/s/AKfycbxrdOKAoO___n1TVP0STRCFf6qG0khthVG79-1Pu2Ne8BNBJWmzGjKYJPxpxZIqEyB7/exec';
+
+// generate all times
+function pad(n){ return n.toString().padStart(2,'0'); }
+const allTimes = [];
 for(let h=8; h<=15; h++){
   for(let m of [0,30]){
-    const pad = n => n.toString().padStart(2,'0');
-    times.push(`${pad(h)}:${pad(m)}`);
+    allTimes.push(`${pad(h)}:${pad(m)}`);
   }
 }
 
-const COUNT_URL = 'YOUR_APPS_SCRIPT_COUNT_URL'; // replace with your Apps Script URL
-
-async function populatePickupTimes() {
-  let counts = {};
-  try {
-    const res = await fetch(COUNT_URL);
-    counts = await res.json();
-    console.log('Live counts:', counts);
-  } catch(err){
-    console.error('Failed to fetch live counts', err);
-  }
-  pickupSelect.innerHTML = '';
-  times.forEach(time => {
-    const count = counts.hasOwnProperty(time) ? counts[time] : 0;
-    const opt = document.createElement('option');
-    opt.value = time;
-    opt.textContent = `${time} (${count} orders)`;
-    pickupSelect.appendChild(opt);
+// fetch counts and populate dropdown
+fetch(COUNT_URL)
+  .then(res => res.json())
+  .then(data => {
+    pickupSelect.innerHTML = '';
+    allTimes.forEach(time => {
+      const count = data[time] || 0;
+      const option = document.createElement('option');
+      option.value = time;
+      option.textContent = `${time} (${count} orders)`;
+      pickupSelect.appendChild(option);
+    });
+  })
+  .catch(err => {
+    console.error("Error loading pickup counts:", err);
+    allTimes.forEach(time => {
+      const option = document.createElement('option');
+      option.value = time;
+      option.textContent = time;
+      pickupSelect.appendChild(option);
+    });
   });
-}
 
-populatePickupTimes();
-
+// Google Form submission
 const buyBtn = document.getElementById('buyBtn');
-buyBtn.addEventListener('click', async () => {
+buyBtn.addEventListener('click', () => {
   const parts = [];
   allCards.forEach(card => {
     const itemName = card.dataset.name;
     const count = Number(card.querySelector('.counter').dataset.count);
     if(count>0) parts.push(`${itemName} x${count}`);
   });
-  if(parts.length===0){ alert('Add at least one item'); return; }
+  if(parts.length === 0){ alert('Add at least one item'); return; }
 
   const orderStr = parts.join(', ');
   const totalStr = total;
@@ -193,10 +198,11 @@ buyBtn.addEventListener('click', async () => {
   formData.append('entry.1633261989', totalStr);
   formData.append('entry.410263436', pickupTime);
 
-  try{
-    await fetch('https://docs.google.com/forms/d/e/1FAIpQLSeplyNN9dAlA2Q16g9mI8wICdst3PdlY_X2u2PXGrtTne3khw/formResponse',{
-      method:'POST', body:formData, mode:'no-cors'
-    });
+  fetch('https://docs.google.com/forms/d/e/1FAIpQLSeplyNN9dAlA2Q16g9mI8wICdst3PdlY_X2u2PXGrtTne3khw/formResponse',{
+    method:'POST',
+    body:formData,
+    mode:'no-cors'
+  }).then(()=>{
     alert('Order submitted! Thank you.');
     allCards.forEach(card=>{
       const counterEl = card.querySelector('.counter');
@@ -204,11 +210,10 @@ buyBtn.addEventListener('click', async () => {
       counterEl.textContent='0';
     });
     updateTotals();
-    await populatePickupTimes(); // refresh live counts
-  } catch(err){
+  }).catch(err=>{
     console.error(err);
     alert('Failed to submit order. Please try again.');
-  }
+  });
 });
 </script>
 
