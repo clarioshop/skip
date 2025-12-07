@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Skip - Menu</title>
+  <style>
+    :root { --bg:#000; --panel:#111; --gold:#FFD700; --gold-soft:#ffea00; --grid-min:220px; }
+    body { margin:0; background:var(--bg); color:var(--gold); font-family:'Segoe UI', system-ui, -apple-system, sans-serif; }
+    header { display:flex; align-items:center; justify-content:space-between; gap:.75rem; padding:1rem 1.25rem; border-bottom:2px solid var(--gold); }
+    .welcome { font-weight:700; }
+    .cart { position:relative; background:var(--gold); color:#000; border-radius:999px; padding:.5rem .9rem; font-weight:800; box-shadow:0 0 10px var(--gold); }
+    .container { max-width:1000px; margin:0 auto; padding:1.25rem; }
+
+    .section-title { margin-top:1rem; font-size:1.4rem; font-weight:800; border-left:4px solid var(--gold); padding-left:.5rem; }
+
+    /* Shared grid + card for food & drinks */
+    .grid { display:grid; grid-template-columns:repeat(auto-fill, minmax(var(--grid-min), 1fr)); gap:1.25rem; margin-top:1rem; }
+    .card { background:var(--panel); border:1px solid var(--gold); border-radius:14px; padding:1rem; position:relative; transition:transform .25s ease, box-shadow .25s ease; cursor:pointer; }
+    .card:hover { transform:translateY(-4px); box-shadow:0 0 14px var(--gold); }
+    .image-box { width:100%; aspect-ratio:1/1; background:#222; border-radius:10px; overflow:hidden; display:flex; align-items:center; justify-content:center; margin-bottom:.8rem; }
+    .image-box img { width:100%; height:100%; object-fit:cover; }
+    .title { font-weight:700; margin:.25rem 0; }
+    .price { opacity:.95; }
+    .counter { position:absolute; top:.75rem; right:.75rem; width:34px; height:34px; border-radius:50%; background:var(--gold); color:#000; display:flex; align-items:center; justify-content:center; font-weight:900; box-shadow:0 0 8px var(--gold); }
+
+    .summary { margin-top:1.25rem; display:grid; grid-template-columns:1fr; gap:.75rem; align-items:center; }
+    .row { display:flex; align-items:center; justify-content:space-between; gap:1rem; flex-wrap:wrap; }
+    select { appearance:none; background:#0e0e0e; color:var(--gold); border:1px solid var(--gold); border-radius:8px; padding:.6rem .9rem; min-width:160px; }
+    .total { font-weight:800; font-size:1.2rem; }
+    .buy { width:100%; background:var(--gold); color:#000; border:none; border-radius:10px; padding:.9rem 1rem; font-weight:900; cursor:pointer; transition:transform .2s ease, background .25s ease; }
+    .buy:hover { transform:scale(1.02); background:var(--gold-soft); }
+    .birr { font-weight:700; }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="welcome" id="welcome">Welcome</div>
+    <div class="cart"><span id="cartCount">0</span> items</div>
+  </header>
+
+  <main class="container">
+    <!-- Food -->
+    <div class="section-title">Food</div>
+    <div class="grid">
+      <div class="card" data-name="Pizza" data-price="250">
+        <div class="counter" data-count="0">0</div>
+        <div class="image-box"><img src="pizza.jpg" alt="Pizza"></div>
+        <div class="title">Pizza</div>
+        <div class="price">250 Birr</div>
+      </div>
+      <div class="card" data-name="Burger" data-price="180">
+        <div class="counter" data-count="0">0</div>
+        <div class="image-box"><img src="burger.jpg" alt="Burger"></div>
+        <div class="title">Burger</div>
+        <div class="price">180 Birr</div>
+      </div>
+      <div class="card" data-name="Salad" data-price="120">
+        <div class="counter" data-count="0">0</div>
+        <div class="image-box"><img src="salad.jpg" alt="Salad"></div>
+        <div class="title">Salad</div>
+        <div class="price">120 Birr</div>
+      </div>
+    </div>
+
+    <!-- Drinks -->
+    <div class="section-title">Drinks</div>
+    <div class="grid">
+      <div class="card" data-name="Water" data-price="40">
+        <div class="counter" data-count="0">0</div>
+        <div class="image-box"><img src="water.jpg" alt="Water"></div>
+        <div class="title">Water</div>
+        <div class="price">40 Birr</div>
+      </div>
+      <div class="card" data-name="Coca Cola" data-price="70">
+        <div class="counter" data-count="0">0</div>
+        <div class="image-box"><img src="coca.jpg" alt="Coca Cola"></div>
+        <div class="title">Coca Cola</div>
+        <div class="price">70 Birr</div>
+      </div>
+      <div class="card" data-name="Sprite" data-price="70">
+        <div class="counter" data-count="0">0</div>
+        <div class="image-box"><img src="sprite.jpg" alt="Sprite"></div>
+        <div class="title">Sprite</div>
+        <div class="price">70 Birr</div>
+      </div>
+    </div>
+
+    <!-- Summary -->
+    <section class="summary">
+      <div class="row">
+        <div class="total">Total: <span id="totalPrice" class="birr">0</span> Birr</div>
+        <div>
+          <label for="pickupTime" style="margin-right:.5rem; font-weight:700;">Pickup time:</label>
+          <select id="pickupTime"></select>
+        </div>
+      </div>
+      <button class="buy" id="buyBtn">Buy Now</button>
+    </section>
+  </main>
+
+  <script>
+    // Personalization
+    const name = localStorage.getItem('skip_name') || 'Guest';
+    const email = localStorage.getItem('skip_email') || '';
+    document.getElementById('welcome').textContent = `Welcome, ${name}!`;
+
+    // Counters and totals
+    let total = 0;
+    const cartCountEl = document.getElementById('cartCount');
+    const totalEl = document.getElementById('totalPrice');
+    const allCards = document.querySelectorAll('.card');
+
+    function updateTotals() {
+      let items = 0, sum = 0;
+      allCards.forEach(card => {
+        const price = Number(card.dataset.price);
+        const count = Number(card.querySelector('.counter').dataset.count);
+        items += count;
+        sum += price * count;
+      });
+      total = sum;
+      cartCountEl.textContent = items;
+      totalEl.textContent = sum;
+    }
+
+    function incrementCard(card) {
+      const counterEl = card.querySelector('.counter');
+      const count = Number(counterEl.dataset.count) + 1;
+      counterEl.dataset.count = String(count);
+      counterEl.textContent = String(count);
+      updateTotals();
+    }
+
+    allCards.forEach(card => {
+      card.addEventListener('click', () => incrementCard(card));
+      card.addEventListener('dblclick', () => incrementCard(card));
+    });
+
+    // Populate pickup times (08:00–15:00 in 30-min steps)
+    const pickupSelect = document.getElementById('pickupTime');
+    function pad(n){ return n.toString().padStart(2,'0'); }
+    for (let h = 8; h <= 15; h++) {
+      for (let m of [0,30]) {
+        const v = `${pad(h)}:${pad(m)}`;
+        const opt = document.createElement('option');
+        opt.value = v;
+        opt.textContent = v;
+        pickupSelect.appendChild(opt);
+      }
+    }
+
+    // Buy Now → POST to your Google Apps Script Web App
+    const buyBtn = document.getElementById('buyBtn');
+    const WEB_URL = 'https://script.google.com/macros/s/AKfycbxip4oobFbnNNIHhca6tKhwbkt7h8C_seFWOYobVdzicrS-YBp490Pv-qS4QsXwQJyw/exec';
+
+    buyBtn.addEventListener('click', async () => {
+      // Build order summary like "Pizza x2, Water x1"
+      const parts = [];
+      allCards.forEach(card => {
+        const itemName = card.dataset.name;
+        const count = Number(card.querySelector('.counter').dataset.count);
+        if (count > 0) parts.push(`${itemName} x${count}`);
+      });
+
+      if (parts.length === 0) {
+        alert('Please add at least one item.');
+        return;
+      }
+
+      const payload = {
+        name,
+        email,
+        time: pickupSelect.value,
+        total: total,
+        order: parts.join(', ')
+      };
+
+      try {
+        const res = await fetch(WEB_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+
+        const text = await res.text();
+        if (text.includes('OK')) {
+          alert('Order submitted! Thank you.');
+          // Reset counts after successful submission
+          allCards.forEach(card => {
+            const counterEl = card.querySelector('.counter');
+            counterEl.dataset.count = '0';
+            counterEl.textContent = '0';
+          });
+          updateTotals();
+        } else {
+          alert('Failed to submit order. Please try again.');
+        }
+      } catch (err) {
+        alert('Failed to submit order. Please try again.');
+        console.error(err);
+      }
+    });
+  </script>
+</body>
+</html>

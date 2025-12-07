@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Skip - Login</title>
+  <style>
+    :root {
+      --bg: #000;
+      --panel: #111;
+      --gold: #FFD700;
+      --gold-soft: #ffea00;
+    }
+    body { margin:0; background:var(--bg); color:var(--gold); font-family:'Segoe UI', system-ui, -apple-system, sans-serif; }
+    header { text-align:center; padding:1.25rem; border-bottom:2px solid var(--gold); }
+    .container { max-width:640px; margin:0 auto; padding:1.25rem; }
+    .card { background:var(--panel); border:1px solid var(--gold); border-radius:12px; padding:1rem; }
+    .group { margin-bottom:1rem; }
+    label { display:block; font-weight:600; margin-bottom:0.35rem; }
+    input {
+      width:100%; padding:0.8rem; border-radius:8px; border:1px solid var(--gold);
+      background:#0e0e0e; color:var(--gold);
+    }
+    input:focus { outline:none; box-shadow:0 0 8px var(--gold); border-color:var(--gold-soft); }
+    button {
+      width:100%; padding:0.9rem; border:none; border-radius:10px; background:var(--gold);
+      color:#000; font-weight:700; cursor:pointer; transition:transform .2s ease, background .25s ease;
+    }
+    button:hover { transform:scale(1.02); background:var(--gold-soft); }
+    .hint { font-size:.9rem; opacity:.85; margin-top:.5rem; }
+  </style>
+</head>
+<body>
+  <header><h1>Skip</h1></header>
+  <main class="container">
+    <div class="card">
+      <h2>Welcome! Please confirm your details</h2>
+      <div class="group">
+        <label for="name">Name</label>
+        <input id="name" type="text" placeholder="Enter your name"/>
+      </div>
+      <div class="group">
+        <label for="email">Email (must end with @binghamacademy.net)</label>
+        <input id="email" type="email" placeholder="you@binghamacademy.net"/>
+        <div class="hint">We’ll use this to personalize your menu.</div>
+      </div>
+      <button id="confirmBtn">Confirm</button>
+    </div>
+  </main>
+
+  <script>
+  const btn = document.getElementById('confirmBtn');
+  btn.addEventListener('click', () => {
+    const name = document.getElementById('name').value.trim();
+    const email = document.getElementById('email').value.trim();
+    const domain = '@binghamacademy.net';
+
+    // Rule 1: name cannot be empty
+    if (!name) {
+      alert('Name cannot be empty.');
+      return;
+    }
+
+    // Rule 2: email must end with domain AND include the name
+    if (!email.endsWith(domain) || !email.toLowerCase().includes(name.toLowerCase())) {
+      alert('Add correct email address.');
+      return;
+    }
+
+    // Passed validation → store and redirect
+    localStorage.setItem('skip_name', name);
+    localStorage.setItem('skip_email', email);
+    window.location.href = 'menu.html';
+  });
+</script>
+</body>
+</html>
