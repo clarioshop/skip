@@ -103,7 +103,6 @@ const name = localStorage.getItem('skip_name') || 'Guest';
 const email = localStorage.getItem('skip_email') || '';
 document.getElementById('welcome').textContent = `Welcome, ${name}!`;
 
-// Counters
 let total = 0;
 const cartCountEl = document.getElementById('cartCount');
 const totalEl = document.getElementById('totalPrice');
@@ -131,10 +130,12 @@ function incrementCard(card) {
 }
 
 allCards.forEach(card => {
+  // Single click = ADD
   card.addEventListener('click', () => {
     incrementCard(card);
   });
 
+  // Double click = REMOVE
   card.addEventListener('dblclick', () => {
     const counterEl = card.querySelector('.counter');
     let count = Number(counterEl.dataset.count);
@@ -147,7 +148,6 @@ allCards.forEach(card => {
     }
   });
 });
-
 
 // Pickup times
 const pickupSelect = document.getElementById('pickupTime');
@@ -176,7 +176,6 @@ buyBtn.addEventListener('click', () => {
   const totalStr = total;
   const pickupTime = pickupSelect.value;
 
-  // Build form data
   const formData = new FormData();
   formData.append('entry.1552952187', name);      // Name
   formData.append('entry.332170824', email);      // Email
@@ -184,7 +183,6 @@ buyBtn.addEventListener('click', () => {
   formData.append('entry.1633261989', totalStr);  // Total
   formData.append('entry.410263436', pickupTime); // Pickup time
 
-  // Send to Google Form
   fetch('https://docs.google.com/forms/d/e/1FAIpQLSeplyNN9dAlA2Q16g9mI8wICdst3PdlY_X2u2PXGrtTne3khw/formResponse', {
     method: 'POST',
     body: formData,
@@ -206,8 +204,3 @@ buyBtn.addEventListener('click', () => {
 
 </body>
 </html>
-
-
-
-
-
